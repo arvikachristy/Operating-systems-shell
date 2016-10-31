@@ -32,6 +32,7 @@ bool stringStart(const char *a,const char *b){
 int colonSplitter(char* buf, char* x){
     int i = 0;
     char *p = strtok (buf, x);
+    arrayPath = malloc(10 * sizeof(char*));
     while (p != NULL)
     {
         arrayPath[i++] = p;
