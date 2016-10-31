@@ -10,7 +10,7 @@
 
 char *home;
 char *path;
-char *arrayPath[256];
+char **arrayPath;
 char *arrayInput[256];
 
 char *getDirectory(){
@@ -32,7 +32,6 @@ bool stringStart(const char *a,const char *b){
 int colonSplitter(char* buf, char* x){
     int i = 0;
     char *p = strtok (buf, x);
-
     while (p != NULL)
     {
         arrayPath[i++] = p;
@@ -58,33 +57,15 @@ int spaceSplitter(char* buf){
     return 0;    
 }
 
-bool openDirectory2(char* inputFile){
-//this function is to open the directory if it exists
-    DIR* dir = opendir("mydir");
-    int u;
-    for(u=0;u<sizeof(arrayInput);u++){
-	if(arrayInput[u]==NULL){
-	    break;
-	}else{
-	    if (dir){
-	    /* Directory exists. */
-	     return true;
-	     closedir(dir);
-	    }else if (ENOENT == errno){
-	    /* Directory does not exist. */
-	     return false;
-	    }else{
-	     return false;/* opendir() failed for some other reason. */
-	    }	  
-	}
-    }
-}
-
 int openDirectory(char *argc)
 {
-    const char* folderr;
-    //folderr = "C:\\Users\\SaMaN\\Desktop\\Ppln";
-    folderr = "/bin";
+  const char* folderr;
+  char arrayPathNew[256];
+  int p=0;
+  while(arrayPath[p] !=NULL){
+
+    strcpy(arrayPathNew, arrayPath[p]);
+    folderr = arrayPathNew;
     struct stat sb;
 
     if (stat(folderr, &sb) == 0 && S_ISDIR(sb.st_mode))
@@ -95,6 +76,9 @@ int openDirectory(char *argc)
     {
         printf("NO\n");
     }
+    p++;
+  }
+    
 }
 
 
