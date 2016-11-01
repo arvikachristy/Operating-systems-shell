@@ -60,13 +60,16 @@ int spaceSplitter(char* buf){
 
 int checkExistance(char *argc)
 {
-  const char* folderr;
+  char* folderr;
   char arrayPathNew[256];
   int p=0;
+  char dest[50];
+
   while(arrayPath[p] !=NULL){
 
     strcpy(arrayPathNew, arrayPath[p]);
-    folderr = arrayPathNew;
+    folderr = arrayPathNew;//"/bin" 
+    strcat(folderr, "/ls");
 
     int exist = cfileexists(folderr);
     if(exist){
