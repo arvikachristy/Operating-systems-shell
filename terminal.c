@@ -121,7 +121,7 @@ int lsh_launch(char **argso)
   int status;
   //char **args;
   //args = malloc(10 * sizeof(char*));
-  char* args[] = { "/bin/ls", "-a"};
+  char* args[] = { "/bin/ls", "-a", NULL};
   
   pid = fork();
   if (pid == 0) {
