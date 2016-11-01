@@ -41,7 +41,6 @@ int colonSplitter(char* buf, char* x){
 
     for (i = 0; i < 3; ++i) 
         printf("%s\n", arrayPath[i]);
-    //strcpy(arrayPath, array);
 
     return 0;    
 }
@@ -60,22 +59,22 @@ int spaceSplitter(char* buf){
 
 int checkExistance(char *argc)
 {
-  char* folderr;
-  char arrayPathNew[256];
+  char* filePath;
+  char arrayPathNew[1000];
   int p=0;
   char dest[50];
 
   while(arrayPath[p] !=NULL){
-
     strcpy(arrayPathNew, arrayPath[p]);
-    folderr = arrayPathNew;//"/bin" 
-    strcat(folderr, "/ls");
+    filePath = arrayPathNew;//"/bin" l
+    strcat(filePath, "/ls");
 
-    int exist = cfileexists(folderr);
+    int exist = cfileexists(filePath);
     if(exist){
-        printf("File %s exist \n",folderr);
+        printf("File %s exist \n",filePath);
+        lsh_launch();
     }else{
-        printf("File %s does not exist \n",folderr);
+        printf("File %s does not exist \n",filePath);
     }
     p++;
   }
@@ -87,7 +86,7 @@ int cfileexists(const char* filename){
     int exist = stat(filename,&buffer);
     if(exist == 0)
         return 1;
-    else // -1
+    else 
         return 0;
 }
 
@@ -120,11 +119,10 @@ int lsh_launch(char **argso)
 {
   pid_t pid, wpid;
   int status;
-  char **args;
-  args = malloc(10 * sizeof(char*));
-  args[0] = "ls";
-  args[1] ="ls";
-
+  //char **args;
+  //args = malloc(10 * sizeof(char*));
+  char* args[] = { "/bin/ls", "-a"};
+  
   pid = fork();
   if (pid == 0) {
     // Child process
