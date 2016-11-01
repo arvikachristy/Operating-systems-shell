@@ -58,7 +58,7 @@ int spaceSplitter(char* buf){
     return 0;    
 }
 
-int openDirectory(char *argc)
+int checkExistance(char *argc)
 {
   const char* folderr;
   char arrayPathNew[256];
@@ -67,22 +67,26 @@ int openDirectory(char *argc)
 
     strcpy(arrayPathNew, arrayPath[p]);
     folderr = arrayPathNew;
-    struct stat sb;
 
-    if (stat(folderr, &sb) == 0 && S_ISDIR(sb.st_mode))
-    {
-        printf("YES\n");
-    }
-    else
-    {
-        printf("NO\n");
+    int exist = cfileexists(folderr);
+    if(exist){
+        printf("File %s exist \n",folderr);
+    }else{
+        printf("File %s does not exist \n",folderr);
     }
     p++;
   }
     
 }
 
-
+int cfileexists(const char* filename){
+    struct stat buffer;
+    int exist = stat(filename,&buffer);
+    if(exist == 0)
+        return 1;
+    else // -1
+        return 0;
+}
 
 int getFile(){
 //reading the file from profile   
@@ -91,22 +95,51 @@ int getFile(){
     char substring[256];
 
     while (fgets(line, sizeof(line), file)) {
-	if(stringStart(line, "HOME")){
-	  strcpy(home, line);
-          //printf("%s", home); //GET RID DEBUGGING
-	}else if(stringStart(line, "PATH")){
-	  strncpy(substring, line+5, sizeof(line));
-	  strcpy(path, substring);
-          printf("%s", colonSplitter(path, ":")); //GET RID  DEBUGGING
-	}
+      if(stringStart(line, "HOME")){
+        strcpy(home, line);
+              //printf("%s", home); //GET RID DEBUGGING
+      }else if(stringStart(line, "PATH")){
+        strncpy(substring, line+5, sizeof(line));
+        strcpy(path, substring);
+              printf("%s", colonSplitter(path, ":")); //GET RID  DEBUGGING
+      }
     }
     if (ferror(file)) {
-	/* deal with error */
+  /* deal with error */
     }
 
     fclose(file);
 
     return 0;
+}
+
+int lsh_launch(char **argso)
+{
+  pid_t pid, wpid;
+  int status;
+  char **args;
+  args = malloc(10 * sizeof(char*));
+  args[0] = "ls";
+  args[1] ="ls";
+
+  pid = fork();
+  if (pid == 0) {
+    // Child process
+    if (execvp(args[0], args) == -1) {
+      perror("lsh");
+    }
+    exit(EXIT_FAILURE);
+  } else if (pid < 0) {
+    // Error forking
+    perror("lsh");
+  } else {
+    // Parent process
+    do {
+      wpid = waitpid(pid, &status, WUNTRACED);
+    } while (!WIFEXITED(status) && !WIFSIGNALED(status));
+  }
+
+  return 1;
 }
 
 int main() {
@@ -115,14 +148,14 @@ int main() {
     getFile();
 
     while(1){
-        char data[200];
-    	printf("%s> ", getDirectory());
-	fgets(data, 300, stdin);
-	spaceSplitter(data);//split the input's white space
+      char data[200];
+      printf("%s> ", getDirectory());
+      fgets(data, 300, stdin);
+      spaceSplitter(data);//split the input's white space
 
-	if(openDirectory(arrayInput[0])){
-          printf("%s\n", arrayInput[0]);
-	}
+      if(checkExistance(arrayInput[0])){
+              printf("%s\n", arrayInput[0]);
+      }
     }
 
     free(home);
