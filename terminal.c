@@ -28,7 +28,6 @@ bool stringStart(const char *a,const char *b){
   }
   return 0;
 }
-
 int colonSplitter(char* buf, char* x){
     int i = 0;
     char *p = strtok (buf, x);
@@ -51,28 +50,47 @@ int spaceSplitter(char* buf){
 
     while (p != NULL)
     {
-        arrayInput[i++] = p;
+      arrayInput[i]= malloc(sizeof(p)*sizeof(char));
+        strcpy(arrayInput[i],p);
+        //printf("i= %d elem=%s\n. len = %d", i, arrayInput[i], strlen(arrayInput[i]));
+        i++;
         p = strtok (NULL, " ");
     }
+    // printf("final i=%d\n\n", i);
+    arrayInput[i-1][strlen(arrayInput[i-1])-1] = '\0';
     return 0;    
 }
 
-int checkExistance(char *argc)
+char** resizableArray(char **userInput){
+  char **newInput;
+  int y=0;
+
+  while(userInput!=NULL){
+    newInput[y] = userInput[y+1];//start from parameter
+  }
+  
+  newInput[sizeof(newInput)+1] = NULL;
+
+  return newInput; 
+}
+
+int checkExistance(char **userInput)
 {
   char* filePath;
   char arrayPathNew[1000];
   int p=0;
-  char dest[50];
 
   while(arrayPath[p] !=NULL){
     strcpy(arrayPathNew, arrayPath[p]);
-    filePath = arrayPathNew;//"/bin" l
-    strcat(filePath, "/ls");
+    filePath = arrayPathNew;
+//    strcat(filePath, "/"); //TODO REPLACE STATIC LS
+    strcat(filePath,"/");
+    strcat(filePath,  userInput[0]);
 
     int exist = cfileexists(filePath);
     if(exist){
         printf("File %s exist \n",filePath);
-        lsh_launch();
+        lsh_launch(filePath);
     }else{
         printf("File %s does not exist \n",filePath);
     }
@@ -81,7 +99,7 @@ int checkExistance(char *argc)
     
 }
 
-int cfileexists(const char* filename){
+int cfileexists(char* filename){
     struct stat buffer;
     int exist = stat(filename,&buffer);
     if(exist == 0)
@@ -90,38 +108,17 @@ int cfileexists(const char* filename){
         return 0;
 }
 
-int getFile(){
-//reading the file from profile   
-    FILE* file = fopen("profile", "r");
-    char line[256];
-    char substring[256];
-
-    while (fgets(line, sizeof(line), file)) {
-      if(stringStart(line, "HOME")){
-        strcpy(home, line);
-              //printf("%s", home); //GET RID DEBUGGING
-      }else if(stringStart(line, "PATH")){
-        strncpy(substring, line+5, sizeof(line));
-        strcpy(path, substring);
-              printf("%s", colonSplitter(path, ":")); //GET RID  DEBUGGING
-      }
-    }
-    if (ferror(file)) {
-  /* deal with error */
-    }
-
-    fclose(file);
-
-    return 0;
-}
-
-int lsh_launch(char **argso)
-{
+int lsh_launch(char *filePath){
   pid_t pid, wpid;
   int status;
-  //char **args;
-  //args = malloc(10 * sizeof(char*));
-  char* args[] = { "/bin/ls", "-a", NULL};
+  char **storeDirectory;
+  //printf("%s\n", newArray[0]);
+
+  storeDirectory = malloc(10 * sizeof(char *));
+  storeDirectory[0]= filePath;
+  printf("%s holla\n", filePath);
+
+  char *args[] = { filePath, "-a", NULL}; //TODO Replace static -a
   
   pid = fork();
   if (pid == 0) {
@@ -143,6 +140,32 @@ int lsh_launch(char **argso)
   return 1;
 }
 
+
+int getFile(){
+//reading the file from profile   
+    FILE* file = fopen("profile", "r");
+    char line[256];
+    char substring[256];
+
+    while (fgets(line, sizeof(line), file)) {
+      if(stringStart(line, "HOME")){
+        strcpy(home, line);
+              printf("%s", home); //GET RID DEBUGGING
+      }else if(stringStart(line, "PATH")){
+        strncpy(substring, line+5, sizeof(line));
+        strcpy(path, substring);
+              printf("%s", colonSplitter(path, ":")); //GET RID  DEBUGGING
+      }
+    }
+    if (ferror(file)) {
+  /* deal with error */
+    }
+
+    fclose(file);
+
+    return 0;
+}
+
 int main() {
     home  = malloc(256);
     path  = malloc(256);
@@ -152,9 +175,10 @@ int main() {
       char data[200];
       printf("%s> ", getDirectory());
       fgets(data, 300, stdin);
-      spaceSplitter(data);//split the input's white space
 
-      if(checkExistance(arrayInput[0])){
+      spaceSplitter(data);//split the input's white space and add it to arrayInput
+
+      if(checkExistance(arrayInput)){
               printf("%s\n", arrayInput[0]);
       }
     }
