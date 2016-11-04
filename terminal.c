@@ -38,9 +38,6 @@ int colonSplitter(char* buf, char* x){
         p = strtok (NULL, x);
     }
 
-    for (i = 0; i < 3; ++i) 
-        printf("%s\n", arrayPath[i]);
-
     return 0;    
 }
 
@@ -52,7 +49,7 @@ int spaceSplitter(char* buf){
     {
       arrayInput[i]= malloc(sizeof(p)*sizeof(char));
         strcpy(arrayInput[i],p);
-        //printf("i= %d elem=%s\n. len = %d", i, arrayInput[i], strlen(arrayInput[i]));
+        
         i++;
         p = strtok (NULL, " ");
     }
@@ -64,14 +61,14 @@ int spaceSplitter(char* buf){
 char** resizableArray(char **userInput){
   char **newInput;
   int y=0;
+  newInput = malloc(10 * sizeof(char*));
 
-  while(userInput!=NULL){
+  while(userInput[y]!=NULL){
     newInput[y] = userInput[y+1];//start from parameter
+    y++;
   }
-  
-  newInput[sizeof(newInput)+1] = NULL;
-
-  return newInput; 
+    newInput[sizeof(newInput)+1] = NULL;
+  return newInput;
 }
 
 int checkExistance(char **userInput)
@@ -89,8 +86,11 @@ int checkExistance(char **userInput)
 
     int exist = cfileexists(filePath);
     if(exist){
-        printf("File %s exist \n",filePath);
-        lsh_launch(filePath);
+        //printf("File %s exist \n",filePath);
+        //printf("%s\n", resizableArray(userInput)[0]);
+        char **newUserInput = resizableArray(userInput);
+        lsh_launch(filePath, newUserInput);
+        break;
     }else{
         printf("File %s does not exist \n",filePath);
     }
@@ -108,24 +108,28 @@ int cfileexists(char* filename){
         return 0;
 }
 
-int lsh_launch(char *filePath){
+int lsh_launch(char *filePath, char** commandArray){
+  //TODO MAKE A CONDITION IF commandArray IS NULL
   pid_t pid, wpid;
   int status;
-  char **storeDirectory;
-  //printf("%s\n", newArray[0]);
+  char** forkInput = malloc(10 * sizeof(char*));
+  int u;
+  int i=0;
+  forkInput[0]=filePath;
 
-  storeDirectory = malloc(10 * sizeof(char *));
-  storeDirectory[0]= filePath;
-  printf("%s holla\n", filePath);
+  for(u=0;u<sizeof(commandArray);u++){
+    forkInput[u+1]=commandArray[u];
+  }
 
-  char *args[] = { filePath, "-a", NULL}; //TODO Replace static -a
-  
   pid = fork();
   if (pid == 0) {
     // Child process
-    if (execvp(args[0], args) == -1) {
+    // if (execvp(filePath, commandArray) == -1) { when no arg
+    //   perror("lsh");
+    // }
+    if (execvp(filePath, forkInput) == -1) {
       perror("lsh");
-    }
+    }    
     exit(EXIT_FAILURE);
   } else if (pid < 0) {
     // Error forking
@@ -150,11 +154,10 @@ int getFile(){
     while (fgets(line, sizeof(line), file)) {
       if(stringStart(line, "HOME")){
         strcpy(home, line);
-              printf("%s", home); //GET RID DEBUGGING
       }else if(stringStart(line, "PATH")){
         strncpy(substring, line+5, sizeof(line));
         strcpy(path, substring);
-              printf("%s", colonSplitter(path, ":")); //GET RID  DEBUGGING
+        colonSplitter(path, ":");
       }
     }
     if (ferror(file)) {
@@ -176,11 +179,8 @@ int main() {
       printf("%s> ", getDirectory());
       fgets(data, 300, stdin);
 
-      spaceSplitter(data);//split the input's white space and add it to arrayInput
-
-      if(checkExistance(arrayInput)){
-              printf("%s\n", arrayInput[0]);
-      }
+      spaceSplitter(data);//split the input's white space and add it to arrayInpu
+      checkExistance(arrayInput);
     }
 
     free(home);
