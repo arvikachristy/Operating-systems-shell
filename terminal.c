@@ -7,6 +7,7 @@
 #include <string.h>
 #include <dirent.h>
 #define MAXINT 1024
+#define DELIMINATOR " \t\r\n\a"
 
 char *home;
 char *path;
@@ -42,8 +43,10 @@ int colonSplitter(char* buf, char* x){
 }
 
 int spaceSplitter(char* buf){
+  char **result = malloc(10*sizeof(char*));
     int i = 0;
-    char *p = strtok (buf, " ");
+    char *saveptr;
+    char *p = strtok(buf, DELIMINATOR);
 
     while (p != NULL)
     {
@@ -51,10 +54,9 @@ int spaceSplitter(char* buf){
         strcpy(arrayInput[i],p);
         
         i++;
-        p = strtok (NULL, " ");
+        p = strtok(NULL, DELIMINATOR);
     }
-    // printf("final i=%d\n\n", i);
-    arrayInput[i-1][strlen(arrayInput[i-1])-1] = '\0';
+    // arrayInput[i-1][strlen(arrayInput[i-1])-1] = '\0';
     return 0;    
 }
 
@@ -123,10 +125,6 @@ int lsh_launch(char *filePath, char** commandArray){
 
   pid = fork();
   if (pid == 0) {
-    // Child process
-    // if (execvp(filePath, commandArray) == -1) { when no arg
-    //   perror("lsh");
-    // }
     if (execvp(filePath, forkInput) == -1) {
       perror("lsh");
     }    
@@ -180,6 +178,8 @@ int main() {
       fgets(data, 300, stdin);
 
       spaceSplitter(data);//split the input's white space and add it to arrayInpu
+
+      //if begins with home
       checkExistance(arrayInput);
     }
 
