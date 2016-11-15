@@ -171,10 +171,21 @@ int getFile(){
 }
 
 int moveHome(){
-  char directory[1024];
-  getcwd(directory, sizeof(directory));
-  if(chdir(home) == 0) {
-     getcwd(directory, sizeof(directory));
+  /*char directory[1024];
+  getcwd(directory, sizeof(directory));*/
+  if(arrayInput[1]!=NULL){
+    //printf("hello%s\n", arrayInput[1]);
+    if(!opendir(arrayInput[1])){
+      fputs("No such file or directory\n", stderr);
+    }
+    else {
+      chdir(arrayInput[1]);
+
+    }
+  }
+  
+  else {
+    chdir(home);
   }
   return 0;
 }
