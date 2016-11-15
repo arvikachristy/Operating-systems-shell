@@ -180,8 +180,8 @@ int moveHome(){
     }
     else {
       chdir(arrayInput[1]);
-
     }
+    arrayInput[1]=NULL;
   }
   
   else {
@@ -192,11 +192,15 @@ int moveHome(){
 
 int dollarHome(char* dollarInput){
   if(!opendir(dollarInput+6)){
-    fputs("No such file or directory\n", stderr);
+      //fputs("No such file or directory\n", stderr);
   }else{
-  strcpy(home, dollarInput+6);
-  setenv("HOME", home, 1);
+    strcpy(home, dollarInput+6);
+    setenv("HOME", home, 1);
+  }
 }
+
+int dollarPath(char* dollarInputPath){
+
 }
 
 int main() {
