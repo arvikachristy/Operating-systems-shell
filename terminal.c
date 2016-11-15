@@ -94,7 +94,8 @@ int checkExistance(char **userInput)
         lsh_launch(filePath, newUserInput);
         break;
     }else{
-        printf("File %s does not exist \n",filePath);
+      //TODO HANDLE ERROR
+      fputs("No such file or directory\n", stderr);
     }
     p++;
   }
@@ -148,10 +149,12 @@ int getFile(){
     FILE* file = fopen("profile", "r");
     char line[256];
     char substring[256];
+    char homeSubstring[256];
 
     while (fgets(line, sizeof(line), file)) {
       if(stringStart(line, "HOME")){
-        strcpy(home, line);
+        strncpy(homeSubstring, line+5, sizeof(line));
+        strcpy(home, homeSubstring);
       }else if(stringStart(line, "PATH")){
         strncpy(substring, line+5, sizeof(line));
         strcpy(path, substring);
@@ -159,12 +162,30 @@ int getFile(){
       }
     }
     if (ferror(file)) {
-  /* deal with error */
+      fputs("No such file or directory\n", stderr);
     }
 
     fclose(file);
 
     return 0;
+}
+
+int moveHome(){
+  char directory[1024];
+  getcwd(directory, sizeof(directory));
+  if(chdir(home) == 0) {
+     getcwd(directory, sizeof(directory));
+  }
+  return 0;
+}
+
+int dollarHome(char* dollarInput){
+  if(!opendir(dollarInput+6)){
+    fputs("No such file or directory\n", stderr);
+  }else{
+  strcpy(home, dollarInput+6);
+  setenv("HOME", home, 1);
+}
 }
 
 int main() {
@@ -178,9 +199,15 @@ int main() {
       fgets(data, 300, stdin);
 
       spaceSplitter(data);//split the input's white space and add it to arrayInpu
-
       //if begins with home
-      checkExistance(arrayInput);
+      if(strcmp(arrayInput[0],"cd")==0){
+        moveHome();
+      }else if(strncmp(arrayInput[0],"$HOME=",6)==0){
+        dollarHome(arrayInput[0]);
+      }
+      else{
+        checkExistance(arrayInput);
+      }
     }
 
     free(home);
