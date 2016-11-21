@@ -6,6 +6,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <dirent.h>
+#include "modifyhome.h"
 #define MAXINT 1024
 #define DELIMINATOR " \t\r\n\a"
 
@@ -52,11 +53,9 @@ int spaceSplitter(char* buf){
     {
       arrayInput[i]= malloc(sizeof(p)*sizeof(char));
         strcpy(arrayInput[i],p);
-        
         i++;
         p = strtok(NULL, DELIMINATOR);
     }
-    // arrayInput[i-1][strlen(arrayInput[i-1])-1] = '\0';
     return 0;    
 }
 
@@ -82,20 +81,17 @@ int checkExistance(char **userInput)
   while(arrayPath[p] !=NULL){
     strcpy(arrayPathNew, arrayPath[p]);
     filePath = arrayPathNew;
-//    strcat(filePath, "/"); //TODO REPLACE STATIC LS
     strcat(filePath,"/");
     strcat(filePath,  userInput[0]);
 
     int exist = cfileexists(filePath);
     if(exist){
-        //printf("File %s exist \n",filePath);
-        //printf("%s\n", resizableArray(userInput)[0]);
         char **newUserInput = resizableArray(userInput);
         lsh_launch(filePath, newUserInput);
         break;
     }else{
-      //TODO HANDLE ERROR
-      fputs("No such file or directory\n", stderr);
+      fputs("Command not found\n", stderr);
+      break;
     }
     p++;
   }
@@ -174,7 +170,6 @@ int moveHome(){
   /*char directory[1024];
   getcwd(directory, sizeof(directory));*/
   if(arrayInput[1]!=NULL){
-    //printf("hello%s\n", arrayInput[1]);
     if(!opendir(arrayInput[1])){
       fputs("No such file or directory\n", stderr);
     }
@@ -190,17 +185,12 @@ int moveHome(){
   return 0;
 }
 
-int dollarHome(char* dollarInput){
-  if(!opendir(dollarInput+6)){
-      //fputs("No such file or directory\n", stderr);
-  }else{
-    strcpy(home, dollarInput+6);
-    setenv("HOME", home, 1);
-  }
-}
-
 int dollarPath(char* dollarInputPath){
-
+  if(!opendir(dollarInputPath+6)){
+      fputs("No such file or directory\n", stderr);
+  }else{
+    strcpy(path, dollarInputPath+6);
+  }
 }
 
 int main() {
@@ -213,12 +203,14 @@ int main() {
       printf("%s> ", getDirectory());
       fgets(data, 300, stdin);
 
-      spaceSplitter(data);//split the input's white space and add it to arrayInpu
-      //if begins with home
+      spaceSplitter(data);
+
       if(strcmp(arrayInput[0],"cd")==0){
         moveHome();
       }else if(strncmp(arrayInput[0],"$HOME=",6)==0){
-        dollarHome(arrayInput[0]);
+        dollarHome(arrayInput[0], home);
+      }else if(strncmp(arrayInput[0],"$PATH",6)==0){
+        dollarPath(arrayInput[0]);
       }
       else{
         checkExistance(arrayInput);
