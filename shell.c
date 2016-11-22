@@ -147,20 +147,21 @@ int main() {
       char data[200];
       printf("%s> ", getDirectory());
       fgets(data, 300, stdin);
+      if(data[0] != '\n'){
+        spaceSplitter(data);
 
-      spaceSplitter(data);
-
-      if(strcmp(arrayInput[0],"cd")==0){
-        runsCD();
-      }else if(strncmp(arrayInput[0],"$HOME=",6)==0){
-        dollarHome(arrayInput[0], home);
-      }else if(strncmp(arrayInput[0],"$PATH=",6)==0){
-        dollarPath(arrayInput[0], path);
-      }
-      else{
-        checkExistance(arrayInput, arrayPath);
-        if(arrayInput[1]!=NULL){
-          arrayInput[1]=NULL;
+        if(strcmp(arrayInput[0],"cd")==0){
+          runsCD();
+        }else if(strncmp(arrayInput[0],"$HOME=",6)==0){
+          dollarHome(arrayInput[0], home);
+        }else if(strncmp(arrayInput[0],"$PATH=",6)==0){
+          dollarPath(arrayInput[0], path);
+        }
+        else{
+          checkExistance(arrayInput, arrayPath);
+          if(arrayInput[1]!=NULL){
+            arrayInput[1]=NULL;
+          }
         }
       }
     }
