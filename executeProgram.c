@@ -39,7 +39,6 @@ char** resizableArray(char **userInput){
 }
 
 int lsh_launch(char *filePath, char** commandArray){
-  //TODO MAKE A CONDITION IF commandArray IS NULL
   pid_t pid, wpid;
   int status;
   char** forkInput = malloc(10 * sizeof(char*));
