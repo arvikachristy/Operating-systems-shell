@@ -88,40 +88,6 @@ int spaceSplitter(char* buf){
     return 0;    
 }
 
-
-int lsh_launch(char *filePath, char** commandArray){
-  //TODO MAKE A CONDITION IF commandArray IS NULL
-  pid_t pid, wpid;
-  int status;
-  char** forkInput = malloc(10 * sizeof(char*));
-  int u;
-  int i=0;
-  forkInput[0]=filePath;
-
-  for(u=0;u<sizeof(commandArray);u++){
-    forkInput[u+1]=commandArray[u];
-  }
-
-  pid = fork();
-  if (pid == 0) {
-    if (execvp(filePath, forkInput) == -1) {
-      perror("lsh");
-    }    
-    exit(EXIT_FAILURE);
-  } else if (pid < 0) {
-    // Error forking
-    perror("lsh");
-  } else {
-    // Parent process
-    do {
-      wpid = waitpid(pid, &status, WUNTRACED);
-    } while (!WIFEXITED(status) && !WIFSIGNALED(status));
-  }
-
-  return 1;
-}
-
-
 int getFile(){
   /*  This function opens the file profile and read its input line by line
       If the line begins with HOME, it will store the Home to variable "home"

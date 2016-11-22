@@ -1,3 +1,12 @@
+/****************************************************************************
+ * Copyright (C) 2016 by Anastasia Arvika Christy                           *
+ *                                                                          *
+ *                                                                          *
+ *  this program will try to execute the given input by the user.           *
+ *  if it exist it will execute it.                                         *
+ *                                                                          *
+ ****************************************************************************/
+
 #include <unistd.h>
 #include <sys/stat.h>
 #include <stdio.h>
@@ -22,19 +31,44 @@ char** resizableArray(char **userInput){
   newInput = malloc(10 * sizeof(char*));
 
   while(userInput[y]!=NULL){
-    newInput[y] = userInput[y+1];//start from parameter
+    newInput[y] = userInput[y+1];
     y++;
   }
     newInput[sizeof(newInput)+1] = NULL;
   return newInput;
 }
 
+int lsh_launch(char *filePath, char** commandArray){
+  //TODO MAKE A CONDITION IF commandArray IS NULL
+  pid_t pid, wpid;
+  int status;
+  char** forkInput = malloc(10 * sizeof(char*));
+  int u;
+  int i=0;
+  forkInput[0]=filePath;
+
+  for(u=0;u<sizeof(commandArray);u++){
+    forkInput[u+1]=commandArray[u];
+  }
+
+  pid = fork();
+  if (pid == 0) {
+    if (execvp(filePath, forkInput) == -1) {
+      perror("lsh");
+    }    
+    exit(EXIT_FAILURE);
+  } else if (pid < 0) {
+      perror("lsh");
+  } else {
+    do {
+      wpid = waitpid(pid, &status, WUNTRACED);
+    } while (!WIFEXITED(status) && !WIFSIGNALED(status));
+  }
+
+  return 1;
+}
 
 int checkExistance(char **userInput, char **arrayPath){
-  /*
-  this program will try to execute the given input by the user.
-  if it exist it will execute it.
-  */
   char* filePath;
   char arrayPathNew[1000];
   int p=0;
