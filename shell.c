@@ -159,6 +159,9 @@ int main() {
       }
       else{
         checkExistance(arrayInput, arrayPath);
+        if(arrayInput[1]!=NULL){
+          arrayInput[1]=NULL;
+        }
       }
     }
     free(home);
