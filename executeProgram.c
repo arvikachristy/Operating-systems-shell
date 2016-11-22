@@ -39,6 +39,9 @@ char** resizableArray(char **userInput){
 }
 
 int lsh_launch(char *filePath, char** commandArray){
+  /*  This function is used to launch the program within the actual shell
+      for example ls -l, ls -a
+  */
   pid_t pid, wpid;
   int status;
   char** forkInput = malloc(10 * sizeof(char*));
