@@ -25,6 +25,7 @@ I also purposedly leave a profile file just in case it wont run on other files. 
 ##ASSUMPTIONS
 1. Assume that this terminal won't reckonise file that has space in it. Such as "cd my file" won't be able to run, However "cd myfile" would.
 2. Assume this terminal won't read a flag after cd such as "cd -P"
+3. Assume that when HOME or PATH in profile doesn't exist, we carry on the program.
 
 **HOWEVER, in WINDOWS machine occured minor difference when HOME is placed below PATH on profile as somehow WINDOWS reads more trailing zeros than Linux. For line 105 in shell.c:
 getFile() In Windows: strncpy(home, homeHolder, strlen(homeHolder)-2);
