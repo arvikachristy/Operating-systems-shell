@@ -102,7 +102,7 @@ int getFile(){
       if(stringStart(line, "HOME")){
         strncpy(homeHolder, line+5, strlen(line)-5);
         if(homeHolder[strlen(homeHolder)-1]=='\n'){
-          strncpy(home, homeHolder, strlen(homeHolder)-2);
+          strncpy(home, homeHolder, strlen(homeHolder)-1);
         }
         else{
           strncpy(home, homeHolder, strlen(homeHolder));
@@ -142,6 +142,7 @@ int main() {
     homeHolder = malloc(256);
     path  = malloc(256);
     getFile();
+
     while(1){
       char data[200];
       printf("%s> ", getDirectory());
