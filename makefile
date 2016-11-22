@@ -1,2 +1,2 @@
-all: modifyhome.c terminal.c
-	gcc modifyhome.c terminal.c -o exec
+all: executeProgram.c modifyHomePath.c terminal.c
+	gcc executeProgram.c modifyHomePath.c terminal.c -o exec
